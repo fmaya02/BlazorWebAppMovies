@@ -1,7 +1,4 @@
 ﻿@page "/movies/create"
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.EntityFrameworkCore
-@using BlazorWebAppMovies.Models
 @inject IDbContextFactory<BlazorWebAppMovies.Data.BlazorWebAppMoviesContext> DbFactory
 @inject NavigationManager NavigationManager
 @attribute [Authorize(Roles = "Administrator")]
