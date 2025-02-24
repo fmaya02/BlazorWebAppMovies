@@ -14,6 +14,7 @@ namespace BlazorWebAppMovies.Data
         {
         }
 
+        public DbSet<BlazorWebAppMovies.Models.UserAccount> Users { get; set; } = default!;
         public DbSet<BlazorWebAppMovies.Models.Movie> Movie { get; set; } = default!;
     }
 }

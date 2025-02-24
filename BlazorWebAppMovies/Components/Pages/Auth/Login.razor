@@ -1,0 +1,74 @@
+﻿@page "/login"
+
+@using BlazorWebAppMovies.Models.ViewModels
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.EntityFrameworkCore
+@using System.Security.Claims
+@inject IDbContextFactory<BlazorWebAppMovies.Data.BlazorWebAppMoviesContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login</PageTitle>
+
+<div class="row">
+    <div class="col pt-4 pb-4 border">
+        <EditForm Model="loginViewModel" OnValidSubmit="Authenticate" FormName="LoginForm">
+            <DataAnnotationsValidator/>
+            <div class="mb-3 text-center flex-column">
+                <h3>LOGIN</h3>
+            </div>
+            <div class="mb-3">
+                <label>Nombre de usuario</label>
+                <InputText @bind-Value="loginViewModel.UserName" class="form-control" placeholder="Nombre de usuario"/>
+                <ValidationMessage For="()=>loginViewModel.UserName"/>
+            </div>
+            <div class="mb-3">
+                <label>Contraseña</label>
+                <InputText @bind-Value="loginViewModel.Password" class="form-control" placeholder="Contraseña" type="password"/>
+                <ValidationMessage For="()=>loginViewModel.Password" />
+            </div>
+            <div class="mb-3 text-center">
+                <span class="text-danger">@errorMessage</span>
+            </div>
+            <div class="mb-3 d-grid gap-2">
+                <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
+
+
+    [SupplyParameterFromForm]
+    public LoginViewModel loginViewModel { get; set; } = new();
+
+    private string? errorMessage;
+
+    private async Task Authenticate()
+    {
+        using var context = DbFactory.CreateDbContext();
+        var userAccount = await context.Users.Where(x => x.UserName == loginViewModel.UserName).FirstOrDefaultAsync();
+        if (userAccount is null || userAccount.UserPassword != loginViewModel.Password)
+        {
+            errorMessage = "Nombre de usuario o Contraseña inválida";
+            return;
+        }
+        else
+        {
+            var claims = new List<Claim>
+			{
+				new Claim(ClaimTypes.Name, loginViewModel.UserName),
+				new Claim(ClaimTypes.Role, userAccount.Role)
+			};
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(principal);
+
+            NavigationManager.NavigateTo("/");
+        }
+	}
+}
