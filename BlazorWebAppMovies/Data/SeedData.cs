@@ -18,12 +18,9 @@ public class SeedData
                 "Null BlazorWebAppMoviesContext or Movie DbSet");
         }
 
-        if (context.Movie.Any())
+        if (!context.Movie.Any())
         {
-            return;
-        }
-
-        context.Movie.AddRange(
+            context.Movie.AddRange(
             new Movie
             {
                 Title = "Mad Max",
@@ -64,7 +61,28 @@ public class SeedData
                 Price = 13.49M,
                 Rating = "R",
             });
-
-        context.SaveChanges();
+            context.SaveChanges();
+        }
+        else if (!context.Users.Any())
+        {
+            context.AddRange(
+            new UserAccount
+            {
+                UserName = "admin",
+                UserPassword = "admin123",
+                Role = "Administrator",
+            },
+            new UserAccount
+            {
+                UserName = "user",
+                UserPassword = "user123",
+                Role = "User",
+            });
+            context.SaveChanges();
+        }
+        else
+        {
+            return;
+        }
     }
 }
