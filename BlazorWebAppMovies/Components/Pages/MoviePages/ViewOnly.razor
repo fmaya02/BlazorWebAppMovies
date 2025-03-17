@@ -29,6 +29,8 @@
 
     private string titleFilter = string.Empty;
 
+    // esto debería ser un servicio aparte que contenga la factoría, y ese servicio debería
+    // ser inyectado aquí, para una mayor escalabilidad y separación de responsabilidades
     private IQueryable<Movie> FilteredMovies =>
         context.Movie.Where(m => m.Title!.Contains(titleFilter));
 
